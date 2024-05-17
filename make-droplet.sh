@@ -47,12 +47,15 @@ echo "Docker installation completed successfully!"
 echo "Installing Github CLI..."
 
 # Download the latest version of GitHub CLI
-sudo apt get -y install gh
+sudo apt install gh
 
 # Verify GitHub CLI installation
 gh --version
 
 echo "Github CLI installation completed successfully!"
 
-# Echo for login instructions
-echo "Please login to your Github account using the 'gh auth login' command."
+# Loging to Github
+echo "Logging to Github..."
+gh auth login
+
+echo "Github login completed successfully!"

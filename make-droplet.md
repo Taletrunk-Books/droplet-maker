@@ -22,24 +22,16 @@ ssh -i path/to/your/private-key user@ip-address
 Clone the repository to your remote machine:
 
 ```sh
+# Clone the repository
 git clone https://github.com/Taletrunk-Books/droplet-maker.git
-```
 
-Navigate to the project directory:
-
-```sh
+# Navigate to the project directory
 cd droplet-maker
-```
 
-Make the script executable:
-
-```sh
+# Make the script executable
 chmod +x make-droplet.sh
-```
 
-Run the script:
-
-```sh
+# Run the script
 ./make-droplet.sh
 ```
 
