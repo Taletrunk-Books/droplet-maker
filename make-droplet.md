@@ -19,7 +19,7 @@ Connect to your remote machine via SSH:
 ssh -i path/to/your/private-key user@ip-address
 ```
 
-Clone the repository to your remote machine:
+Copy and paste the following commands into your terminal:
 
 ```sh
 # Clone the repository
