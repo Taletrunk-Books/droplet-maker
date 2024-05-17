@@ -4,16 +4,16 @@ This project contains a script for setting up a new droplet with Docker and GitH
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your remote machine for development and testing purposes.
 
 ### Prerequisites
 
-- A Unix-like operating system: macOS, Linux, BSD. On Windows: WSL is preferred, but cygwin or msys also mostly work.
+- A Unix-like operating system: macOS, Linux, BSD.
 - `bash`, `curl`, `sudo`
 
 ### Installation
 
-Clone the repository to your local machine:
+Clone the repository to your remote machine:
 
 ```sh
 git clone https://github.com/Taletrunk-Books/droplet-maker.git
