@@ -24,7 +24,7 @@ function setup_config() {
     read -p "Enter the id_rsa file location: " RSA_FILE
     read -p "Enter the user name for SSH connection: " SSH_USER
     read -p "Enter the IP address for SSH connection: " SSH_IP
-    read -p "Enter the repository folder name (repository name): " REPO_FOLDER
+    read -p "Enter the repository folder name (without extension): " REPO_FOLDER
 
     echo "REPO_LINK=$REPO_LINK" > $CONFIG_FILE
     echo "RSA_FILE=$RSA_FILE" >> $CONFIG_FILE
@@ -79,7 +79,8 @@ function reconnect_and_refresh() {
         echo "Taking down Docker setup..."
         docker compose down
         echo "Building and starting Docker setup..."
-        docker compose up -d --build
+        docker compose build --no-cache
+        docker compose up -d
 EOF
 }
 
