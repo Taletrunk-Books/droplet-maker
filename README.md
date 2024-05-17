@@ -1,6 +1,6 @@
-# Droplet Maker
+# Project Title
 
-This project contains a script for setting up a new droplet with Docker and GitHub CLI pre-installed.
+This project contains two scripts: `make-droplet.sh` and `setup.sh`. The `make-droplet.sh` script sets up a new droplet with Docker and GitHub CLI pre-installed. The `setup.sh` script is a primitive Git deployment script that sets up an SSH connection, clones a repository, and manages Docker containers.
 
 ## Getting Started
 
@@ -15,33 +15,22 @@ These instructions will get you a copy of the project up and running on your loc
 
 Clone the repository to your local machine:
 
-```sh
-git clone https://github.com/yourusername/droplet-maker.git
+```bash
+git clone https:/github.com/Taletrunk-Books/droplet-maker.git
 ```
 
 Navigate to the project directory:
 
-```sh
+```bash
 cd droplet-maker
 ```
 
-Make the script executable:
+### Usage
 
-```sh
-chmod +x droplet-maker.sh
-```
+#### Droplet Maker
 
-Run the script:
+The `make-droplet.sh` script sets up a new droplet with Docker and GitHub CLI pre-installed. To use it, follow the instructions in `make-droplet.md`.
 
-```sh
-./droplet-maker.sh
-```
+#### Primitive Git Deployment Script
 
-## Usage
-
-After running the script, Docker and GitHub CLI will be installed on your machine. You can verify the installations with the following commands:
-
-```sh
-docker --version
-gh --version
-```
+The `setup.sh` script is a primitive Git deployment script. To use it, copy it to the repository you want to deploy, and follow the instructions in `setup-readme.md`.
