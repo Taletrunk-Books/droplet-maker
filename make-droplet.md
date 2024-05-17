@@ -16,7 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 Clone the repository to your local machine:
 
 ```sh
-git clone https://github.com/yourusername/droplet-maker.git
+git clone https://github.com/Taletrunk-Books/droplet-maker.git
 ```
 
 Navigate to the project directory:
@@ -28,7 +28,7 @@ cd droplet-maker
 Make the script executable:
 
 ```sh
-chmod +x droplet-maker.sh
+chmod +x make-droplet.sh
 ```
 
 Run the script:
