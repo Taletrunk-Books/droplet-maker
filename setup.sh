@@ -1,6 +1,20 @@
 #!/bin/bash
 
 CONFIG_FILE=setup.cfg
+GITIGNORE=.gitignore
+
+function add_to_gitignore_if_not_exists() {
+    if [ ! -f "$GITIGNORE" ]; then
+        touch "$GITIGNORE"
+    fi
+
+    if ! grep -q "$CONFIG_FILE" "$GITIGNORE"; then
+        echo "$CONFIG_FILE" >> "$GITIGNORE"
+        echo "Added $CONFIG_FILE to $GITIGNORE"
+    else
+        echo "$CONFIG_FILE is already in $GITIGNORE"
+    fi
+}
 
 # Function to prompt the user for input and save to config file
 function setup_config() {
@@ -19,6 +33,9 @@ function setup_config() {
     echo "REPO_FOLDER=$REPO_FOLDER" >> $CONFIG_FILE
 
     echo "Configuration saved. Setting up SSH and cloning repository..."
+
+    add_to_gitignore_if_not_exists
+
     setup_ssh_and_clone
 }
 
