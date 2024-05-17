@@ -27,8 +27,17 @@ function setup_ssh_and_clone() {
     source $CONFIG_FILE
 
     echo "Establishing SSH connection and cloning repository..."
+    # Prompt for passphrase
+    read -s -p "Enter the passphrase for the SSH key: " SSH_PASSPHRASE
+    echo
+
+    # Start the ssh-agent in the background
+    eval "$(ssh-agent -s)"
+    # Add your SSH private key to the ssh-agent
+    echo $SSH_PASSPHRASE | ssh-add $RSA_FILE
+
     # Establish SSH connection and clone repository
-    ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
             echo "Repository not found. Cloning..."
             git clone $REPO_LINK
@@ -44,6 +53,15 @@ function reconnect_and_refresh() {
     source $CONFIG_FILE
 
     echo "Reconnecting and refreshing Docker setup..."
+    # Prompt for passphrase
+    read -s -p "Enter the passphrase for the SSH key: " SSH_PASSPHRASE
+    echo
+
+    # Start the ssh-agent in the background
+    eval "$(ssh-agent -s)"
+    # Add your SSH private key to the ssh-agent
+    echo $SSH_PASSPHRASE | ssh-add $RSA_FILE
+
     ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         echo "Navigating to repository folder..."
         cd $REPO_FOLDER
