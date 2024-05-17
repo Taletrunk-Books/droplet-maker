@@ -40,7 +40,7 @@ chmod +x make-droplet.sh
 Run the script:
 
 ```sh
-./droplet-maker.sh
+./make-droplet.sh
 ```
 
 ## Usage
