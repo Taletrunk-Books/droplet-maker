@@ -27,24 +27,20 @@ function setup_ssh_and_clone() {
     source $CONFIG_FILE
 
     echo "Establishing SSH connection and cloning repository..."
-    # Prompt for passphrase
-    read -s -p "Enter the passphrase for the SSH key: " SSH_PASSPHRASE
-    echo
 
     # Start the ssh-agent in the background
-    eval "$(ssh-agent -s)"
-    # Add your SSH private key to the ssh-agent
-    echo $SSH_PASSPHRASE | ssh-add $RSA_FILE
+    eval "$(ssh-agent -s)"t
+    ssh-add $RSA_FILE
 
     # Establish SSH connection and clone repository
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
             echo "Repository not found. Cloning..."
-            git clone $REPO_LINK
+            gh repo clone $REPO_LINK
         fi
         echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
-        docker-compose up -d --build
+        docker compose up -d --build
 EOF
 }
 
@@ -53,26 +49,31 @@ function reconnect_and_refresh() {
     source $CONFIG_FILE
 
     echo "Reconnecting and refreshing Docker setup..."
-    # Prompt for passphrase
-    read -s -p "Enter the passphrase for the SSH key: " SSH_PASSPHRASE
-    echo
 
     # Start the ssh-agent in the background
     eval "$(ssh-agent -s)"
-    # Add your SSH private key to the ssh-agent
-    echo $SSH_PASSPHRASE | ssh-add $RSA_FILE
+    ssh-add $RSA_FILE
 
     ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         echo "Navigating to repository folder..."
         cd $REPO_FOLDER
+        echo "Pulling latest changes from repository..."
+        git pull origin
         echo "Taking down Docker setup..."
-        docker-compose down
+        docker compose down
         echo "Building and starting Docker setup..."
-        docker-compose up -d --build
+        docker compose up -d --build
 EOF
 }
 
 # Main script logic
+if [[ $1 == "--clean" ]]; then
+    if [ -f "$CONFIG_FILE" ]; then
+        echo "Clean start requested. Deleting configuration file..."
+        rm $CONFIG_FILE
+    fi
+fi
+
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Configuration file not found. Setting up configuration..."
     setup_config
