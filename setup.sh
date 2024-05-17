@@ -24,7 +24,7 @@ function setup_config() {
     read -p "Enter the id_rsa file location: " RSA_FILE
     read -p "Enter the user name for SSH connection: " SSH_USER
     read -p "Enter the IP address for SSH connection: " SSH_IP
-    read -p "Enter the repository folder name (without extension): " REPO_FOLDER
+    read -p "Enter the repository folder name (repository name): " REPO_FOLDER
 
     echo "REPO_LINK=$REPO_LINK" > $CONFIG_FILE
     echo "RSA_FILE=$RSA_FILE" >> $CONFIG_FILE
