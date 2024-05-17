@@ -54,8 +54,5 @@ gh --version
 
 echo "Github CLI installation completed successfully!"
 
-# Loging to Github
-echo "Logging to Github..."
-gh auth login
-
-echo "Github login completed successfully!"
+# Echo for login instructions
+echo "Please login to your Github account using the 'gh auth login' command."
