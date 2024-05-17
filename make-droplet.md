@@ -13,6 +13,12 @@ These instructions will get you a copy of the project up and running on your rem
 
 ### Installation
 
+Connect to your remote machine via SSH:
+
+```sh
+ssh -i path/to/your/private-key user@ip-address
+```
+
 Clone the repository to your remote machine:
 
 ```sh
