@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_FILE=config.cfg
+CONFIG_FILE=setup.cfg
 
 # Function to prompt the user for input and save to config file
 function setup_config() {
@@ -18,6 +18,7 @@ function setup_config() {
     echo "SSH_IP=$SSH_IP" >> $CONFIG_FILE
     echo "REPO_FOLDER=$REPO_FOLDER" >> $CONFIG_FILE
 
+    echo "Configuration saved. Setting up SSH and cloning repository..."
     setup_ssh_and_clone
 }
 
@@ -25,11 +26,14 @@ function setup_config() {
 function setup_ssh_and_clone() {
     source $CONFIG_FILE
 
+    echo "Establishing SSH connection and cloning repository..."
     # Establish SSH connection and clone repository
     ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
+            echo "Repository not found. Cloning..."
             git clone $REPO_LINK
         fi
+        echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
         docker-compose up -d --build
 EOF
@@ -39,16 +43,22 @@ EOF
 function reconnect_and_refresh() {
     source $CONFIG_FILE
 
+    echo "Reconnecting and refreshing Docker setup..."
     ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
+        echo "Navigating to repository folder..."
         cd $REPO_FOLDER
+        echo "Taking down Docker setup..."
         docker-compose down
+        echo "Building and starting Docker setup..."
         docker-compose up -d --build
 EOF
 }
 
 # Main script logic
 if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Configuration file not found. Setting up configuration..."
     setup_config
 else
+    echo "Configuration file found. Reconnecting and refreshing Docker setup..."
     reconnect_and_refresh
 fi
