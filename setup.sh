@@ -46,7 +46,7 @@ function setup_ssh_and_clone() {
     echo "Establishing SSH connection and cloning repository..."
 
     # Start the ssh-agent in the background
-    eval "$(ssh-agent -s)"t
+    eval "$(ssh-agent -s)"
     ssh-add $RSA_FILE
 
     # Establish SSH connection and clone repository
