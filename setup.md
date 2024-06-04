@@ -1,6 +1,17 @@
 # Setup - Primitive Git Deployment Script
 
-## Explanation:
+## How to Use:
+
+1. Save the script as `setup.sh` in your repository.
+2. Make the script executable:
+   ```bash
+   chmod +x setup.sh
+   ```
+3. Run the script:
+   ```bash
+    ./setup.sh
+   ```
+#### Explanation:
 
 1. **Initial Setup (`setup_config` Function):**
 
@@ -22,15 +33,3 @@
    - Checks if the configuration file exists.
    - If not, runs the setup process.
    - If it does, performs the refresh process.
-
-### How to Use:
-
-1. Save the script as `setup.sh` in your repository.
-2. Make the script executable:
-   ```bash
-   chmod +x setup.sh
-   ```
-3. Run the script:
-   ```bash
-    ./setup.sh
-   ```
