@@ -53,7 +53,7 @@ function setup_ssh_and_clone() {
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
             echo "Repository not found. Cloning..."
-            gh repo clone $REPO_LINK
+            gh repo clone $REPO_LINK -- -b $BRANCH_NAME $REPO_FOLDER
         fi
         echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
@@ -74,25 +74,58 @@ function reconnect_and_refresh() {
     ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         echo "Navigating to repository folder..."
         cd $REPO_FOLDER
-        echo "Pulling latest changes from repository..."
-        git pull origin
+        echo "Pulling latest changes from $BRANCH_NAME..."
+        git checkout $BRANCH_NAME
+        git pull origin $BRANCH_NAME
         echo "Taking down Docker setup..."
         docker compose down
+        echo "Cleaning up unused Docker resources..."
+        docker system prune -f
         echo "Building and starting Docker setup..."
         docker compose build --no-cache
         docker compose up -d
 EOF
 }
 
+# Function to clean up Docker space
+function clean_docker_space() {
+    source $CONFIG_FILE
+
+    echo "Cleaning up Docker space..."
+
+    # Start the ssh-agent in the background
+    eval "$(ssh-agent -s)"
+    ssh-add $RSA_FILE
+
+    ssh -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
+        echo "Cleaning up unused Docker resources..."
+        docker system prune -f
+EOF
+}
+
 # Main script logic
+BRANCH_NAME="main" # Default branch
+
+while getopts "b:" opt; do
+    case $opt in
+        b) BRANCH_NAME=$OPTARG ;;
+        \?) echo "Invalid option -$OPTARG" >&2; exit 1 ;;
+    esac
+done
+
 if [[ $1 == "--clean" ]]; then
     if [ -f "$CONFIG_FILE" ]; then
         echo "Clean start requested. Deleting configuration file..."
         rm $CONFIG_FILE
     fi
-fi
-
-if [ ! -f "$CONFIG_FILE" ]; then
+elif [[ $1 == "--cleanup" ]]; then
+    if [ -f "$CONFIG_FILE" ]; then
+        echo "Cleaning up Docker space..."
+        clean_docker_space
+    else
+        echo "Configuration file not found. Cannot clean Docker space without it."
+    fi
+elif [ ! -f "$CONFIG_FILE" ]; then
     echo "Configuration file not found. Setting up configuration..."
     setup_config
 else
