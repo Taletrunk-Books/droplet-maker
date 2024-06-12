@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CONFIG_FILE=setup.cfg
 GITIGNORE=.gitignore
 
+# Function to add configuration file to .gitignore
 function add_to_gitignore_if_not_exists() {
     if [ ! -f "$GITIGNORE" ]; then
         touch "$GITIGNORE"
@@ -18,8 +18,8 @@ function add_to_gitignore_if_not_exists() {
 
 # Function to prompt the user for input and save to config file
 function setup_config() {
-    echo "First time setup:"
-    
+    echo "First time setup for environment: $ENV"
+
     read -p "Enter the repository link: " REPO_LINK
     read -p "Enter the id_rsa file location: " RSA_FILE
     read -p "Enter the user name for SSH connection: " SSH_USER
@@ -32,7 +32,7 @@ function setup_config() {
     echo "SSH_IP=$SSH_IP" >> $CONFIG_FILE
     echo "REPO_FOLDER=$REPO_FOLDER" >> $CONFIG_FILE
 
-    echo "Configuration saved. Setting up SSH and cloning repository..."
+    echo "Configuration saved for $ENV environment. Setting up SSH and cloning repository..."
 
     add_to_gitignore_if_not_exists
 
@@ -43,7 +43,7 @@ function setup_config() {
 function setup_ssh_and_clone() {
     source $CONFIG_FILE
 
-    echo "Establishing SSH connection and cloning repository..."
+    echo "Establishing SSH connection and cloning repository for $ENV environment..."
 
     # Start the ssh-agent in the background
     eval "$(ssh-agent -s)"
@@ -53,11 +53,11 @@ function setup_ssh_and_clone() {
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
             echo "Repository not found. Cloning..."
-            gh repo clone $REPO_LINK -- -b $BRANCH_NAME $REPO_FOLDER
+            gh repo clone $REPO_LINK
         fi
         echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
-        docker compose up -d --build
+        docker compose -f docker-compose.yml up -d --build
 EOF
 }
 
@@ -65,7 +65,7 @@ EOF
 function reconnect_and_refresh() {
     source $CONFIG_FILE
 
-    echo "Reconnecting and refreshing Docker setup..."
+    echo "Reconnecting and refreshing Docker setup for $ENV environment..."
 
     # Start the ssh-agent in the background
     eval "$(ssh-agent -s)"
@@ -78,12 +78,12 @@ function reconnect_and_refresh() {
         git checkout $BRANCH_NAME
         git pull origin $BRANCH_NAME
         echo "Taking down Docker setup..."
-        docker compose down
+        docker compose -f docker-compose.yml down
         echo "Cleaning up unused Docker resources..."
         docker system prune -f
         echo "Building and starting Docker setup..."
-        docker compose build --no-cache
-        docker compose up -d
+        docker compose -f docker-compose.yml build --no-cache
+        docker compose -f docker-compose.yml up -d
 EOF
 }
 
@@ -91,7 +91,7 @@ EOF
 function clean_docker_space() {
     source $CONFIG_FILE
 
-    echo "Cleaning up Docker space..."
+    echo "Cleaning up Docker space for $ENV environment..."
 
     # Start the ssh-agent in the background
     eval "$(ssh-agent -s)"
@@ -104,31 +104,68 @@ EOF
 }
 
 # Main script logic
-BRANCH_NAME="main" # Default branch
+BRANCH_NAME="dev" # Default branch
+ENV="dev"          # Default environment
 
-while getopts "b:" opt; do
-    case $opt in
-        b) BRANCH_NAME=$OPTARG ;;
-        \?) echo "Invalid option -$OPTARG" >&2; exit 1 ;;
+PARSED_OPTIONS=$(getopt -o b:e: --long branch:,env:,clean,cleanup -- "$@")
+if [[ $? -ne 0 ]]; then
+    echo "Invalid option" >&2
+    exit 1
+fi
+
+eval set -- "$PARSED_OPTIONS"
+
+while true; do
+    case "$1" in
+        -b|--branch)
+            BRANCH_NAME=$2
+            shift 2
+            ;;
+        -e|--env)
+            ENV=$2
+            shift 2
+            ;;
+        --clean)
+            CLEAN=true
+            shift
+            ;;
+        --cleanup)
+            CLEANUP=true
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Invalid option" >&2
+            exit 1
+            ;;
     esac
 done
 
-if [[ $1 == "--clean" ]]; then
+CONFIG_FILE="setup_${ENV}.cfg"
+
+if [[ $CLEAN == true ]]; then
     if [ -f "$CONFIG_FILE" ]; then
-        echo "Clean start requested. Deleting configuration file..."
+        echo "Clean start requested for $ENV environment. Deleting configuration file..."
         rm $CONFIG_FILE
     fi
-elif [[ $1 == "--cleanup" ]]; then
+fi
+
+if [[ $CLEANUP == true ]]; then
     if [ -f "$CONFIG_FILE" ]; then
-        echo "Cleaning up Docker space..."
+        echo "Cleaning up Docker space for $ENV environment..."
         clean_docker_space
     else
-        echo "Configuration file not found. Cannot clean Docker space without it."
+        echo "Configuration file not found for $ENV environment. Cannot clean Docker space without it."
     fi
-elif [ ! -f "$CONFIG_FILE" ]; then
-    echo "Configuration file not found. Setting up configuration..."
+fi
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Configuration file not found for $ENV environment. Setting up configuration..."
     setup_config
 else
-    echo "Configuration file found. Reconnecting and refreshing Docker setup..."
+    echo "Configuration file found for $ENV environment. Reconnecting and refreshing Docker setup..."
     reconnect_and_refresh
 fi
