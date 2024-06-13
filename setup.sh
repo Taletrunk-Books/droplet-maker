@@ -57,6 +57,7 @@ function setup_ssh_and_clone() {
         fi
         echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
+        $(copy_env_file)  # Copy .env file
         docker compose -f docker-compose.yml up -d --build
 EOF
 }
@@ -77,6 +78,7 @@ function reconnect_and_refresh() {
         echo "Pulling latest changes from $BRANCH_NAME..."
         git checkout $BRANCH_NAME
         git pull origin $BRANCH_NAME
+        $(copy_env_file)  # Copy .env file
         echo "Taking down Docker setup..."
         docker compose -f docker-compose.yml down
         echo "Cleaning up unused Docker resources..."
@@ -101,6 +103,19 @@ function clean_docker_space() {
         echo "Cleaning up unused Docker resources..."
         docker system prune -f
 EOF
+}
+
+# Function to copy .env file to project directory
+function copy_env_file() {
+    local local_env_file=".env"
+    local remote_project_dir="$REPO_FOLDER"
+
+    if [ -f "$local_env_file" ]; then
+        echo "Copying .env file to the project directory..."
+        scp -i $RSA_FILE $local_env_file $SSH_USER@$SSH_IP:$remote_project_dir/.env
+    else
+        echo ".env file not found in the local directory."
+    fi
 }
 
 # Main script logic
