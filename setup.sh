@@ -80,6 +80,7 @@ function reconnect_and_refresh() {
         echo "Taking down Docker setup..."
         docker compose -f docker-compose.yml down
         echo "Cleaning up unused Docker resources..."
+        sudo systemctl restart docker
         docker system prune -f
         echo "Building and starting Docker setup..."
         docker compose -f docker-compose.yml build --no-cache
