@@ -16,9 +16,10 @@ This script facilitates the deployment and management of a Git repository on a r
 
 3. **Run the Script:**
    ```bash
-   ./setup.sh -b <branch_name>
+   ./setup.sh -b <branch_name> -e <environment_name>
    ```
    Replace `<branch_name>` with the branch you want to deploy. If no branch is specified, it defaults to `dev`.
+   Replace `<environment_name>` with the environment you want to deploy. If no env is specified, it defaults tp `dev`.
 
 ## Usage Examples
 
