@@ -53,7 +53,7 @@ function setup_ssh_and_clone() {
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $RSA_FILE $SSH_USER@$SSH_IP << EOF
         if [ ! -d "$REPO_FOLDER" ]; then
             echo "Repository not found. Cloning..."
-            gh repo clone $REPO_LINK
+            gh repo clone $REPO_LINK $REPO_FOLDER
         fi
         echo "Navigating to repository folder and setting up Docker..."
         cd $REPO_FOLDER
