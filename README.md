@@ -1,4 +1,4 @@
-# Project Title
+# Droplet Maker
 
 This project contains two scripts: `make-droplet.sh` and `setup.sh`. The `make-droplet.sh` script sets up a new droplet with Docker and GitHub CLI pre-installed. The `setup.sh` script is a primitive Git deployment script that sets up an SSH connection, clones a repository, and manages Docker containers.
 
